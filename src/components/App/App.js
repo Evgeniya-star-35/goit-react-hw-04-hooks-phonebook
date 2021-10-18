@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import Container from '../Container';
 import Form from '../Form';
 import Filter from '../Filter';
@@ -6,69 +6,54 @@ import ContactList from '../ContactsList';
 import initialContacts from '../../contacts.json';
 import s from './App.module.css';
 
-class App extends Component {
-  state = {
-    contacts: initialContacts,
-    filter: '',
-  };
-  formSubmitHandler = data => {
-    const comparableElement = this.state.contacts.some(
+function App() {
+  const [contacts, setContacts] = useState(() => {
+    return JSON.parse(
+      window.localStorage.getItem('contacts') ?? initialContacts,
+    );
+  });
+  const [filter, setFilter] = useState('');
+
+  const formSubmitHandler = data => {
+    const comparableElement = contacts.some(
       element => element.name.toLowerCase() === data.name.toLowerCase(),
     );
     if (comparableElement) {
       return alert('contact is already in the directory');
     }
 
-    this.setState(({ contacts }) => ({
-      contacts: [data, ...contacts],
-    }));
+    setContacts([...contacts, data]);
   };
-  changeFilter = e => {
-    this.setState({ filter: e.currentTarget.value });
+  const changeFilter = e => {
+    setFilter(e.target.value);
   };
-  getVisibleContact = () => {
-    const { filter, contacts } = this.state;
+  const getVisibleContact = () => {
     const contactFilter = filter.toLowerCase();
     return contacts.filter(contact =>
       contact.name.toLowerCase().includes(contactFilter),
     );
   };
 
-  deleteContact = contactId => {
-    this.setState(prevState => ({
-      contacts: prevState.contacts.filter(contact => contact.id !== contactId),
-    }));
+  const deleteContact = contactId => {
+    setContacts(contacts.filter(contact => contact.id !== contactId));
   };
-  componentDidMount() {
-    const contacts = localStorage.getItem('contacts');
-    const parsedContacts = JSON.parse(contacts);
-    if (parsedContacts) {
-      this.setState({ contacts: parsedContacts });
-    }
-  }
-  componentDidUpdate(prevState) {
-    if (this.state.contacts !== prevState.contacts) {
-      localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
-    }
-  }
 
-  render() {
-    const { filter } = this.state;
-    const { formSubmitHandler, changeFilter, deleteContact } = this;
-    const visibleContacts = this.getVisibleContact();
-    return (
-      <Container>
-        <h1 className={s.title}>Phonebook</h1>
-        <Form onSubmit={formSubmitHandler} />
-        <Filter value={filter} onChange={changeFilter} />
-        <h2 className={s.contactTitle}>Contacts</h2>
-        <ContactList
-          contacts={visibleContacts}
-          onDeleteContact={deleteContact}
-        />
-      </Container>
-    );
-  }
+  useEffect(() => {
+    window.localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
+
+  return (
+    <Container>
+      <h1 className={s.title}>Phonebook</h1>
+      <Form onSubmit={formSubmitHandler} />
+      <Filter value={filter} onChange={changeFilter} />
+      <h2 className={s.contactTitle}>Contacts</h2>
+      <ContactList
+        contacts={getVisibleContact()}
+        onDeleteContact={deleteContact}
+      />
+    </Container>
+  );
 }
 
 export default App;
