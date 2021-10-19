@@ -24,9 +24,11 @@ function App() {
 
     setContacts([...contacts, data]);
   };
+
   const changeFilter = e => {
     setFilter(e.target.value);
   };
+  
   const getVisibleContact = () => {
     const contactFilter = filter.toLowerCase();
     return contacts.filter(contact =>

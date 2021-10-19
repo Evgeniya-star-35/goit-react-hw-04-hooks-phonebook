@@ -4,24 +4,18 @@ import s from './Form.module.css';
 import PropTypes from 'prop-types'; // ES6
 
 export default function Form({ onSubmit }) {
-  // state = {
-  //   name: '',
-  //   number: '',
-  // };
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
 
   const handleInputChange = e => {
-    // const { name, value } = e.target;
-    // this.setState({ [name]: value });
     setName(e.target.value);
   };
+
   const handlerInputNumberChange = e => {
     setNumber(e.target.value);
   };
 
   const handleSubmit = e => {
-    // const { name, number } = this.state;
     e.preventDefault();
     const contact = {
       id: uuidv4(),
@@ -32,7 +26,6 @@ export default function Form({ onSubmit }) {
     reset();
   };
   const reset = () => {
-    // this.setState({ name: '', number: '' });
     setName('');
     setNumber('');
   };
